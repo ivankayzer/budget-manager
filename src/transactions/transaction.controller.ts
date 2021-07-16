@@ -24,9 +24,9 @@ export class TransactionController {
   ) {}
 
   @Get()
-  transactions(@BodyWithUserId() dto: UserDto) {
+  getTransactionForCurrentMonth(@BodyWithUserId() dto: UserDto) {
     return this.transactionService
-      .getAll(dto)
+      .getTransactionsForCurrentMonth(dto)
       .then((transactions) =>
         transactions.map(this.transactionTransformer.transform),
       );

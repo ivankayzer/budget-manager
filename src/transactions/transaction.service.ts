@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserDto } from 'src/auth/dto/user.dto';
-import { DeleteResult, Repository } from 'typeorm';
+import { Between, DeleteResult, Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './transaction.entity';
+import { format, addMonths } from 'date-fns';
 
 @Injectable()
 export class TransactionService {
@@ -13,8 +14,16 @@ export class TransactionService {
     private transactionRepository: Repository<Transaction>,
   ) {}
 
-  getAll(dto: UserDto): Promise<Transaction[]> {
-    return this.transactionRepository.find({ userId: dto.userId });
+  getTransactionsForCurrentMonth(dto: UserDto): Promise<Transaction[]> {
+    const formatDate = (date) => format(date, 'yyyy-MM-01');
+
+    const date = formatDate(new Date());
+    const nextMonth = formatDate(addMonths(new Date(), 1));
+
+    return this.transactionRepository.find({
+      userId: dto.userId,
+      paidAt: Between(date, nextMonth),
+    });
   }
 
   createTransaction(dto: CreateTransactionDto) {

@@ -31,6 +31,7 @@
     "@nestjs/typeorm": "^8.0.1",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
+    "date-fns": "^2.22.1",
     "dotenv": "^10.0.0",
     "jwks-rsa": "^2.0.3",
     "mysql2": "^2.2.5",
