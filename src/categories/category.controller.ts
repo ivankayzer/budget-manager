@@ -49,6 +49,6 @@ export class CategoryController {
 
   @Delete(':id')
   deleteCategory(@BodyWithUserId() dto: UserDto, @Param('id') id: number) {
-    return this.categoryService.deleteCategoryById(id, dto);
+    this.categoryService.deleteCategoryById(id, dto);
   }
 }

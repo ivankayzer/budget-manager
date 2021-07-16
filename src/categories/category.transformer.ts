@@ -7,6 +7,7 @@ export class CategoryTransformer implements EntityTransformer {
     return {
       id: category.id,
       name: category.name,
+      createdAt: category.createdAt,
     };
   }
 }
