@@ -1,3 +1,9 @@
+import { IsString, Length } from "class-validator";
+
 export class CreateCategoryDto {
-    constructor(public readonly name, public userId) {}
+    @IsString()
+    name: string;
+
+    @IsString()
+    userId: string;
 }

@@ -1,5 +1,6 @@
-import { Get, Controller, Post, Req, Body, UseGuards } from "@nestjs/common";
+import { Controller, Post, UseGuards, UsePipes } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
+import { BodyWithUserId } from "src/auth/body-with-user.decorator";
 import { CategoryService } from "./category.service";
 import { CreateCategoryDto } from "./dto/create-category.dto";
 
@@ -9,10 +10,7 @@ export class CategoryController {
     constructor(private readonly categoryService: CategoryService) {}
 
     @Post('/categories')
-    createCategory(@Req() req: JwtRequest, @Body() dto: CreateCategoryDto): void {
-      // @todo create own decorator
-      dto.userId = req.user.sub;
-      
+    createCategory(@BodyWithUserId() dto: CreateCategoryDto): void {
       this.categoryService.createCategory(dto);
     }
 }
