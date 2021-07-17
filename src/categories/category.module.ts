@@ -9,6 +9,6 @@ import { CategoryTransformer } from './category.transformer';
   imports: [TypeOrmModule.forFeature([Category])],
   controllers: [CategoryController],
   providers: [CategoryService, CategoryTransformer],
+  exports: [CategoryService],
 })
-
 export class CategoryModule {}

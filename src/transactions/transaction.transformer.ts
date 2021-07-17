@@ -10,6 +10,8 @@ export class TransactionTransformer implements EntityTransformer {
       paidAt: transaction.paidAt,
       description: transaction.description,
       type: transaction.type,
+      categoryId: transaction.category?.id || null,
+      categoryName: transaction.category?.name || null,
       createdAt: transaction.createdAt,
     };
   }

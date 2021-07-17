@@ -1,4 +1,4 @@
-import { IsDateString, IsIn, IsInt, IsString } from 'class-validator';
+import { IsDateString, IsIn, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreateTransactionDto {
   @IsString()
@@ -15,4 +15,8 @@ export class CreateTransactionDto {
 
   @IsString()
   description: string;
+
+  @IsOptional()
+  @IsInt()
+  categoryId: number | null;
 }

@@ -13,6 +13,10 @@ export class CategoryService {
     private categoryRepository: Repository<Category>,
   ) {}
 
+  getById(id: number): Promise<Category | undefined> {
+    return this.categoryRepository.findOne(id);
+  }
+
   getAll(dto: UserDto): Promise<Category[]> {
     return this.categoryRepository.find({ userId: dto.userId });
   }

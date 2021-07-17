@@ -6,12 +6,15 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './transaction.entity';
 import { format, addMonths } from 'date-fns';
+import { CategoryService } from 'src/categories/category.service';
+import { ValidationError } from 'class-validator';
 
 @Injectable()
 export class TransactionService {
   constructor(
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
+    private categoryService: CategoryService,
   ) {}
 
   getTransactionsForCurrentMonth(dto: UserDto): Promise<Transaction[]> {
@@ -26,13 +29,18 @@ export class TransactionService {
     });
   }
 
-  createTransaction(dto: CreateTransactionDto) {
+  async createTransaction(dto: CreateTransactionDto) {
     const transaction = new Transaction();
     transaction.amount = dto.amount;
     transaction.description = dto.description;
     transaction.userId = dto.userId;
     transaction.paidAt = dto.paidAt;
     transaction.type = dto.type;
+
+    if (dto.categoryId) {
+      const category = await this.categoryService.getById(dto.categoryId);
+      transaction.category = category;
+    }
 
     return this.transactionRepository.save(transaction);
   }
