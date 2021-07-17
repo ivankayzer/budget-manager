@@ -7,13 +7,15 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getHello(): { message: string } {
+    return { message: this.appService.getHello() };
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get("/protected")
-  getProtectedHello(@Req() req: JwtRequest): string {
-    return "Hello";
+  @Get('/protected')
+  getProtectedHello(@Req() req: JwtRequest): { message: string } {
+    return {
+      message: 'Hello, you are authenticated.',
+    };
   }
 }

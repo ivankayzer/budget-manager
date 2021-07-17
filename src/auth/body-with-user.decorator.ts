@@ -4,7 +4,7 @@ import {
   applyDecorators,
   Body,
 } from '@nestjs/common';
-import { ValidationPipe } from 'src/validation.pipe';
+import { ValidationPipe } from '../validation.pipe';
 
 export const BodyWithUserId = (): any => {
   const userIdDecorator = createParamDecorator(

@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserDto } from 'src/auth/dto/user.dto';
+import { UserDto } from '../auth/dto/user.dto';
 import { Between, DeleteResult, Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './transaction.entity';
 import { format, addMonths } from 'date-fns';
-import { CategoryService } from 'src/categories/category.service';
-import { ValidationError } from 'class-validator';
+import { CategoryService } from '../categories/category.service';
 
 @Injectable()
 export class TransactionService {

@@ -8,12 +8,12 @@ import {
   Get,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { BodyWithUserId } from 'src/auth/body-with-user.decorator';
+import { BodyWithUserId } from '../auth/body-with-user.decorator';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryTransformer } from './category.transformer';
-import { UserDto } from 'src/auth/dto/user.dto';
+import { UserDto } from '../auth/dto/user.dto';
 
 @Controller('categories')
 @UseGuards(AuthGuard('jwt'))

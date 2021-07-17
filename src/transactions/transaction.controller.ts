@@ -8,8 +8,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { BodyWithUserId } from 'src/auth/body-with-user.decorator';
-import { UserDto } from 'src/auth/dto/user.dto';
+import { BodyWithUserId } from '../auth/body-with-user.decorator';
+import { UserDto } from '../auth/dto/user.dto';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { TransactionService } from './transaction.service';
