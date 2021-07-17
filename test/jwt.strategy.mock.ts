@@ -5,7 +5,11 @@ import { Strategy as StrategyMock } from 'passport-jwt-mock';
 @Injectable()
 export class JwtStrategyMock extends PassportStrategy(StrategyMock) {
   constructor() {
-    super({});
+    super({
+      payload: {
+        sub: 'fake-user',
+      },
+    });
   }
 
   validate(payload: unknown): unknown {

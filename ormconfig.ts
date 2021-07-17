@@ -14,7 +14,7 @@ module.exports = {
   password: process.env.DB_PASS || '',
   database: process.env.DB_DATABASE || 'finansist',
   entities: [__dirname + (isTest ? '' : '/dist') + '/src/**/*.entity.{js,ts}'],
-  migrations: [__dirname + (isTest ? '' : '/dist') + '/migrations/*.js'],
+  migrations: [__dirname + (isTest ? '' : '/dist') + '/migrations/*.{js,ts}'],
   cli: {
     migrationsDir: 'migrations',
   },
