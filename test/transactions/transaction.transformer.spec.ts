@@ -21,7 +21,7 @@ describe('TransactionTransformer', () => {
 
     const transformed = new TransactionTransformer().transform(transaction);
 
-    expect(transformed).toMatchObject({
+    expect(transformed).toStrictEqual({
       id: 34,
       amount: 3456,
       description: 'Fake description',
@@ -46,7 +46,7 @@ describe('TransactionTransformer', () => {
 
     const transformed = new TransactionTransformer().transform(transaction);
 
-    expect(transformed).toMatchObject({
+    expect(transformed).toStrictEqual({
       id: 34,
       amount: 3456,
       description: 'Fake description',
