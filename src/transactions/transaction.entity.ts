@@ -22,13 +22,13 @@ export class Transaction {
   @Column({ type: 'date' })
   paidAt: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @Column()
   type: string;
 
-  @ManyToOne(type => Category, {
+  @ManyToOne((type) => Category, {
     eager: true,
     onDelete: 'SET NULL',
     nullable: true,

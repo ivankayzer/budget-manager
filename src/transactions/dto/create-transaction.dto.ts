@@ -13,8 +13,9 @@ export class CreateTransactionDto {
   @IsDateString()
   paidAt: string;
 
+  @IsOptional()
   @IsString()
-  description: string;
+  description: string | null;
 
   @IsOptional()
   @IsInt()

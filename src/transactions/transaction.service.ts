@@ -44,23 +44,26 @@ export class TransactionService {
     return this.transactionRepository.save(transaction);
   }
 
-  updateTransactionById(
+  async updateTransactionById(
     id: number,
     dto: UpdateTransactionDto,
   ): Promise<Transaction> {
-    return this.transactionRepository
-      .findOne({
-        id,
-        userId: dto.userId,
-      })
-      .then((transaction: Transaction) => {
-        transaction.amount = dto.amount;
-        transaction.description = dto.description;
-        transaction.paidAt = dto.paidAt;
-        transaction.type = dto.type;
+    const transaction = await this.transactionRepository.findOne({
+      id,
+      userId: dto.userId,
+    });
 
-        return this.transactionRepository.save(transaction);
-      });
+    transaction.amount = dto.amount;
+    transaction.description = dto.description;
+    transaction.paidAt = dto.paidAt;
+    transaction.type = dto.type;
+
+    if (dto.categoryId) {
+      const category = await this.categoryService.getById(dto.categoryId);
+      transaction.category = category;
+    }
+
+    return this.transactionRepository.save(transaction);
   }
 
   deleteTransactionById(id: number, dto: UserDto): Promise<DeleteResult> {
