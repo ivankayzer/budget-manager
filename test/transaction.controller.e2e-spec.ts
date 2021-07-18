@@ -9,7 +9,6 @@ import { MigrationRunner } from './migration-runner';
 import { getRepository } from 'typeorm';
 import { Transaction } from '../src/transactions/transaction.entity';
 import transactionFactory from './factories/transaction';
-import { Response } from 'express';
 
 describe('TransactionController (e2e)', () => {
   let app: INestApplication;
@@ -17,7 +16,7 @@ describe('TransactionController (e2e)', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule, TransactionModule],
+      imports: [AppModule],
     })
       .overrideProvider(JwtStrategy)
       .useClass(JwtStrategyMock)
@@ -39,11 +38,12 @@ describe('TransactionController (e2e)', () => {
 
   it('/ (GET) returns transactions', async () => {
     const repo = getRepository(Transaction);
+    await Promise.all(transactionFactory.buildList(5).map((t) => repo.save(t)));
 
     return request(app.getHttpServer())
       .get('/transactions')
       .expect(200)
-      .expect([]);
+      .expect((res) => expect(res.body.length).toBe(5));
   });
 
   afterEach(async () => {
