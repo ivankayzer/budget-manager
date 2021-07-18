@@ -1,10 +1,10 @@
 import { Factory } from 'fishery';
 import { Category } from '../../src/categories/category.entity';
-import { format } from 'date-fns';
+import { lorem } from 'faker';
 
 export default Factory.define<Category>(({ sequence }) => ({
-  id: sequence,
+  id: null,
   userId: 'fake-user',
-  name: 'fake-name',
+  name: lorem.word(),
   createdAt: undefined,
 }));

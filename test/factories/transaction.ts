@@ -1,14 +1,24 @@
 import { Factory } from 'fishery';
 import { Transaction } from '../../src/transactions/transaction.entity';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { lorem, random, date, datatype } from 'faker';
 
 export default Factory.define<Transaction>(({ sequence }) => ({
-  id: sequence,
+  id: null,
   userId: 'fake-user',
-  amount: 1000,
-  description: 'Fake description',
+  amount: datatype.number(100000),
+  description: random.arrayElement([null, lorem.words(5)]),
   createdAt: undefined,
-  type: 'expense',
-  paidAt: format(new Date(), 'yyyy-MM-15'),
+  type: random.arrayElement([
+    'expense',
+    'refund',
+    'income',
+    'expense',
+    'expense',
+  ]),
+  paidAt: format(
+    date.between(startOfMonth(new Date()), endOfMonth(new Date())),
+    'yyyy-MM-dd',
+  ),
   category: null,
 }));
