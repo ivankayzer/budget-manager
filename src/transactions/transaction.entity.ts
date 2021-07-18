@@ -22,7 +22,7 @@ export class Transaction {
   @Column({ type: 'date' })
   paidAt: string;
 
-  @Column({ nullable: true })
+  @Column()
   description: string;
 
   @Column()

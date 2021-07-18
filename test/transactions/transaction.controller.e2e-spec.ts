@@ -4,20 +4,18 @@ import * as request from 'supertest';
 import { AppModule } from './../../src/app.module';
 import { JwtStrategy } from '../../src/auth/jwt.strategy';
 import { JwtStrategyMock } from '../jwt.strategy.mock';
-import { MigrationRunner } from '../migration-runner';
-import { getRepository, Repository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { Transaction } from '../../src/transactions/transaction.entity';
 import transactionFactory from '../factories/transaction';
 import { format, addMonths } from 'date-fns';
+import { TransactionModule } from '../../src/transactions/transaction.module';
 
 describe('TransactionController (e2e)', () => {
   let app: INestApplication;
-  let migrationRunner: MigrationRunner;
-  let repo: Repository<Transaction>;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, TransactionModule],
     })
       .overrideProvider(JwtStrategy)
       .useClass(JwtStrategyMock)
@@ -25,11 +23,10 @@ describe('TransactionController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+  });
 
-    migrationRunner = new MigrationRunner();
-    await migrationRunner.migrate();
-
-    repo = getRepository(Transaction);
+  afterEach(async () => {
+    await app.close();
   });
 
   it('/ (GET) returns empty array if no transactions found', () => {
@@ -40,6 +37,7 @@ describe('TransactionController (e2e)', () => {
   });
 
   it('/ (GET) returns transactions', async () => {
+    const repo = getRepository(Transaction);
     await Promise.all(transactionFactory.buildList(5).map((t) => repo.save(t)));
 
     return request(app.getHttpServer())
@@ -49,6 +47,7 @@ describe('TransactionController (e2e)', () => {
   });
 
   it('/ (GET) returns transactions scoped for this month', async () => {
+    const repo = getRepository(Transaction);
     await repo.save(
       transactionFactory.build({ paidAt: format(new Date(), 'yyyy-MM-15') }),
     );
@@ -136,15 +135,15 @@ describe('TransactionController (e2e)', () => {
   });
 
   it('/:id (PATCH) updates a transaction and returns updated transaction', async () => {
-    request(app.getHttpServer()).post('/transactions').send({
+    await request(app.getHttpServer()).post('/transactions').send({
       amount: 500,
       type: 'income',
       paidAt: '2020-01-01',
       description: 'Fake description',
     });
 
-    return request(app.getHttpServer())
-      .patch('/transactions/1')
+    request(app.getHttpServer())
+      .patch(`/transactions/1`)
       .send({
         amount: 501,
         type: 'expense',
@@ -160,10 +159,17 @@ describe('TransactionController (e2e)', () => {
       });
   });
 
-  it('/:id (DELETE) will delete a transaction', async () => {});
+  it('/:id (DELETE) will delete a transaction', async () => {
+    const repo = getRepository(Transaction);
 
-  afterEach(async () => {
-    await migrationRunner.undo();
-    await app.close();
+    await request(app.getHttpServer())
+      .post('/transactions')
+      .send(transactionFactory.build());
+
+    expect((await repo.find({})).length).toEqual(1);
+
+    await request(app.getHttpServer()).delete('/transactions/1');
+
+    expect((await repo.find({})).length).toEqual(0);
   });
 });

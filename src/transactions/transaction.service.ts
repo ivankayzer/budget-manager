@@ -31,7 +31,7 @@ export class TransactionService {
   async createTransaction(dto: CreateTransactionDto) {
     const transaction = new Transaction();
     transaction.amount = dto.amount;
-    transaction.description = dto.description;
+    transaction.description = dto.description || "";
     transaction.userId = dto.userId;
     transaction.paidAt = dto.paidAt;
     transaction.type = dto.type;
@@ -54,7 +54,7 @@ export class TransactionService {
     });
 
     transaction.amount = dto.amount;
-    transaction.description = dto.description;
+    transaction.description = dto.description || "";
     transaction.paidAt = dto.paidAt;
     transaction.type = dto.type;
 

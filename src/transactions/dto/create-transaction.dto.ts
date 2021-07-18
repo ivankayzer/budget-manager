@@ -15,9 +15,9 @@ export class CreateTransactionDto {
 
   @IsOptional()
   @IsString()
-  description: string | null;
+  description: string;
 
   @IsOptional()
   @IsInt()
-  categoryId: number | null;
+  categoryId: number;
 }
