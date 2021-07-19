@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AnalyticsModule } from './analytics/analytics.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -11,6 +12,7 @@ import { TransactionModule } from './transactions/transaction.module';
     AuthModule,
     CategoryModule,
     TransactionModule,
+    AnalyticsModule,
     TypeOrmModule.forRoot(),
   ],
   controllers: [AppController],

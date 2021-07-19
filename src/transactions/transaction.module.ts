@@ -10,6 +10,6 @@ import { TransactionTransformer } from './transaction.transformer';
   imports: [TypeOrmModule.forFeature([Transaction]), CategoryModule],
   controllers: [TransactionController],
   providers: [TransactionService, TransactionTransformer],
+  exports: [TypeOrmModule],
 })
-
 export class TransactionModule {}
