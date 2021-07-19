@@ -40,7 +40,7 @@ export class TransactionController {
   }
 
   @Patch(':id')
-  updateCategory(
+  updateTransaction(
     @BodyWithUserId() dto: UpdateTransactionDto,
     @Param('id') id: number,
   ) {
@@ -50,7 +50,7 @@ export class TransactionController {
   }
 
   @Delete(':id')
-  deleteCategory(@BodyWithUserId() dto: UserDto, @Param('id') id: number) {
+  deleteTransaction(@BodyWithUserId() dto: UserDto, @Param('id') id: number) {
     this.transactionService.deleteTransactionById(id, dto);
   }
 }

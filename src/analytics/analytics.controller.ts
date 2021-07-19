@@ -1,38 +1,24 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { DateCreator } from 'src/date-creator';
 import { BodyWithUserId } from '../auth/body-with-user.decorator';
 import { UserDto } from '../auth/dto/user.dto';
 import { AnalyticsService } from './analytics.service';
 
 @Controller('analytics')
-// @UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'))
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get()
-  async getAnalytics() {
-    const totalIncome = this.analyticsService.getTotalIncome('fake-user', [
-      '2021-07-01',
-      '2021-07-31',
-    ]);
-    const totalExpense = this.analyticsService.getTotalExpenses('fake-user', [
-      '2021-07-01',
-      '2021-07-31',
-    ]);
-    const incomeByCategory = this.analyticsService.getIncomeByCategories(
-      'fake-user',
-      ['2021-07-01', '2021-07-31'],
-    );
-    const expenseByCategory = this.analyticsService.getExpensesByCategory(
-      'fake-user',
-      ['2021-07-01', '2021-07-31'],
-    );
+  async getAnalytics(@BodyWithUserId() dto: UserDto) {
+    const dates = new DateCreator().create();
 
     return Promise.all([
-      totalIncome,
-      totalExpense,
-      incomeByCategory,
-      expenseByCategory,
+      this.analyticsService.getTotalIncome(dto.userId, dates),
+      this.analyticsService.getTotalExpenses(dto.userId, dates),
+      this.analyticsService.getIncomeByCategories(dto.userId, dates),
+      this.analyticsService.getExpensesByCategory(dto.userId, dates),
     ]).then(
       ({
         0: totalIncome,
