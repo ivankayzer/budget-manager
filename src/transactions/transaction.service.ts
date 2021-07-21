@@ -37,7 +37,7 @@ export class TransactionService {
     transaction.type = dto.type;
 
     if (dto.categoryId) {
-      const category = await this.categoryService.getById(dto.categoryId);
+      const category = await this.categoryService.getById(dto.userId, dto.categoryId);
       transaction.category = category;
     }
 
@@ -59,7 +59,7 @@ export class TransactionService {
     transaction.type = dto.type;
 
     if (dto.categoryId) {
-      const category = await this.categoryService.getById(dto.categoryId);
+      const category = await this.categoryService.getById(dto.userId, dto.categoryId);
       transaction.category = category;
     }
 

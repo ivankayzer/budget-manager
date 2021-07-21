@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserDto } from 'src/auth/dto/user.dto';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, In, Repository } from 'typeorm';
 import { Category } from './category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -13,8 +13,17 @@ export class CategoryService {
     private categoryRepository: Repository<Category>,
   ) {}
 
-  getById(id: number): Promise<Category | undefined> {
-    return this.categoryRepository.findOne(id);
+  getById(userId: string, id: number): Promise<Category | undefined> {
+    return this.categoryRepository.findOne({ id, userId });
+  }
+
+  getByIds(userId: string, ids: number[]): Promise<Category[]> {
+    return this.categoryRepository.find({
+      where: {
+        id: In(ids),
+        userId,
+      },
+    });
   }
 
   getAll(dto: UserDto): Promise<Category[]> {
