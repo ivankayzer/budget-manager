@@ -6,6 +6,8 @@ import { BudgetSchedulerCalculator } from './budget-scheduler-calculator';
 import { BudgetScheduler } from './budget-scheduler.entity';
 import { Budget } from './budget.entity';
 import { CreateBudgetRequest } from './dto/create-budget-request.dto';
+import { DeleteBudgetRequest } from './dto/delete-budget-request.dto';
+import { UpdateBudgetRequest } from './dto/update-budget-request.dto';
 
 @Injectable()
 export class BudgetService {
@@ -32,6 +34,66 @@ export class BudgetService {
     const budget = await this.createBudgetModel(dto, scheduler);
 
     return this.budgetRepository.save(budget);
+  }
+
+  public async deleteBudgetById(id: number, dto: DeleteBudgetRequest) {
+    const { userId } = dto;
+
+    const budget = await this.budgetRepository.findOne({
+      id,
+      userId,
+    });
+    const schedulerId = budget.scheduler.id;
+
+    switch (dto.delete) {
+      case 'this':
+        this.budgetRepository.delete({ id, userId });
+        break;
+      case 'upcoming':
+        this.budgetSchedulerRepository.delete({
+          id: schedulerId,
+          userId,
+        });
+        break;
+      case 'this-and-upcoming':
+        this.budgetRepository.delete({ id, userId });
+        this.budgetSchedulerRepository.delete({
+          id: schedulerId,
+          userId,
+        });
+        break;
+    }
+  }
+
+  // @TODO handle case when modifying 'this' from last month. 
+  // 'upcoming' and 'this-and-upcoming' should change all budgets with id > 'this'
+  public async updateBudgetById(id: number, dto: UpdateBudgetRequest) {
+    const { userId } = dto;
+
+    const budget = await this.budgetRepository.findOne({
+      id,
+      userId,
+    });
+    const scheduler = budget.scheduler;
+
+    switch (dto.change) {
+      case 'this':
+        budget.amount = dto.amount;
+        this.budgetRepository.save(budget);
+        break;
+      case 'upcoming':
+        scheduler.amount = dto.amount;
+        this.budgetSchedulerRepository.save(scheduler);
+        break;
+      case 'this-and-upcoming':
+        budget.amount = dto.amount;
+        this.budgetRepository.save(budget);
+        scheduler.amount = dto.amount;
+        this.budgetSchedulerRepository.save(scheduler);
+        break;
+    }
+
+    return budget;
   }
 
   private async createScheduledBudget(dto: CreateBudgetRequest) {

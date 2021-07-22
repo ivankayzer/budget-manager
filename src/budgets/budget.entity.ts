@@ -32,6 +32,7 @@ export class Budget {
   categories: Category[];
 
   @ManyToOne((type) => BudgetScheduler, {
+    eager: true,
     onDelete: 'SET NULL',
     nullable: true,
     cascade: ['update'],

@@ -1,9 +1,12 @@
-import {
-  IsIn,
-} from 'class-validator';
-import { CreateBudgetRequest } from './create-budget-request.dto';
+import { IsIn, IsInt, IsString } from 'class-validator';
 
-export class UpdateBudgetRequest extends CreateBudgetRequest {
-  @IsIn(['upcoming', 'this'])
-  change: 'this' | 'upcoming';
+export class UpdateBudgetRequest {
+  @IsString()
+  userId: string;
+
+  @IsInt()
+  amount: number;
+
+  @IsIn(['this', 'this-and-upcoming', 'upcoming'])
+  change: BudgetScope;
 }

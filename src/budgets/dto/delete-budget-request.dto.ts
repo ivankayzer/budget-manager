@@ -4,6 +4,6 @@ export class DeleteBudgetRequest {
   @IsString()
   userId: string;
 
-  @IsIn(['upcoming', 'this'])
-  delete: 'this' | 'upcoming';
+  @IsIn(['this', 'this-and-upcoming', 'upcoming'])
+  delete: BudgetScope;
 }
