@@ -6,14 +6,16 @@ import { BudgetService } from './budget.service';
 import { BudgetTransformer } from './budget.transformer';
 import { CategoryModule } from 'src/categories/category.module';
 import { BudgetController } from './budget.controller';
+import { BudgetSchedulerCalculator } from './budget-scheduler-calculator';
+import { DateCreator } from 'src/date-creator';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Budget, BudgetScheduler]),
-    CategoryModule
+    CategoryModule,
   ],
   controllers: [BudgetController],
-  providers: [BudgetService, BudgetTransformer],
+  providers: [BudgetService, BudgetTransformer, DateCreator, BudgetSchedulerCalculator],
   exports: [TypeOrmModule],
 })
 export class BudgetModule {}

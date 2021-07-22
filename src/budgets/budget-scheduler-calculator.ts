@@ -9,9 +9,9 @@ export class BudgetSchedulerCalculator {
   public calculateEndFromStart(
     repeat: RepeatFrequency,
     start: string,
-  ): string {
+  ): string | null {
     if (repeat === 'none') {
-      return '';
+      return null;
     }
 
     let date = parse(start, this.dateCreator.getFormat(), new Date());

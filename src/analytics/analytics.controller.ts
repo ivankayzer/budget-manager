@@ -8,11 +8,14 @@ import { AnalyticsService } from './analytics.service';
 @Controller('analytics')
 @UseGuards(AuthGuard('jwt'))
 export class AnalyticsController {
-  constructor(private readonly analyticsService: AnalyticsService) {}
+  constructor(
+    private readonly analyticsService: AnalyticsService,
+    private readonly dateCreator: DateCreator,
+  ) {}
 
   @Get()
   async getAnalytics(@BodyWithUserId() dto: UserDto) {
-    const dates = new DateCreator().create();
+    const dates = this.dateCreator.create();
 
     return Promise.all([
       this.analyticsService.getTotalIncome(dto.userId, dates),

@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BudgetModule } from './budgets/budget.module';
 import { CategoryModule } from './categories/category.module';
+import { DateCreator } from './date-creator';
 import { TransactionModule } from './transactions/transaction.module';
 
 @Module({
@@ -18,6 +19,6 @@ import { TransactionModule } from './transactions/transaction.module';
     TypeOrmModule.forRoot(),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, DateCreator],
 })
 export class AppModule {}

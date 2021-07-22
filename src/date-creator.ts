@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import {
   format as fnsFormat,
   endOfMonth,
@@ -6,6 +7,7 @@ import {
   endOfYear,
 } from 'date-fns';
 
+@Injectable()
 export class DateCreator {
   public create(date?: string): [string, string] {
     if (!date) {

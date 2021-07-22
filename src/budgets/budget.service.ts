@@ -24,7 +24,7 @@ export class BudgetService {
     if (!dto.end) {
       scheduler = await this.createScheduledBudget(dto);
       dto.end = this.budgetSchedulerCalculator.calculateEndFromStart(
-        scheduler,
+        scheduler.repeat,
         dto.start,
       );
     }
@@ -63,6 +63,7 @@ export class BudgetService {
     budget.end = dto.end;
     budget.amount = dto.amount;
     budget.userId = dto.userId;
+    budget.scheduler = scheduler;
 
     if (dto.categoryIds) {
       budget.categories = await this.categoryService.getByIds(
@@ -70,8 +71,6 @@ export class BudgetService {
         dto.categoryIds,
       );
     }
-
-    budget.scheduler = scheduler;
 
     return budget;
   }
