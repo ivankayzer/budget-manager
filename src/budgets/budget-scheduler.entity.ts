@@ -27,7 +27,7 @@ export class BudgetScheduler {
   rollover: boolean;
 
   @Column()
-  repeat: 'monthly' | 'weekly' | 'none';
+  repeat: RepeatFrequency;
 
   @ManyToMany((type) => Category)
   @JoinTable()

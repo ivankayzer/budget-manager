@@ -57,7 +57,11 @@ export class DateCreator {
     ];
   }
 
-  private format(date: Date): string {
-    return fnsFormat(date, 'yyyy-MM-dd');
+  public format(date: Date): string {
+    return fnsFormat(date, this.getFormat());
+  }
+
+  public getFormat(): string {
+    return 'yyyy-MM-dd';
   }
 }

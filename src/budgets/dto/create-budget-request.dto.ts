@@ -7,7 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 
-export class CreateBudgetDto {
+export class CreateBudgetRequest {
   @IsString()
   userId: string;
 
@@ -16,7 +16,7 @@ export class CreateBudgetDto {
 
   @IsOptional()
   @IsString()
-  end: string | undefined;
+  end: string;
 
   @IsInt()
   amount: number;
@@ -29,5 +29,5 @@ export class CreateBudgetDto {
   rollover: boolean | undefined;
 
   @IsIn(['monthly', 'weekly', 'none'])
-  repeat: 'monthly' | 'weekly' | 'none';
+  repeat: RepeatFrequency;
 }
