@@ -25,6 +25,7 @@
     "buxfer-import": "npm run build && node dist/buxfer-import.js"
   },
   "dependencies": {
+    "@fast-csv/parse": "^4.3.6",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/passport": "^8.0.0",
