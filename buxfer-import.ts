@@ -53,16 +53,13 @@ const transform = (row) => {
 
     let transformed = [];
 
-    await new Promise<void>((resolve) => {
+    await new Promise<number>((resolve) => {
       const stream = parse({ headers: true })
         .on('error', (error) => console.error(error))
         .on('data', (row) => {
           transformed.push(transform(row));
         })
-        .on('end', (rowCount: number) => {
-          console.log(`Processed ${rowCount} rows`);
-          resolve();
-        });
+        .on('end', resolve);
 
       stream.write(fs.readFileSync(FILE));
       stream.end();
