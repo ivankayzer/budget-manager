@@ -1,0 +1,31 @@
+openapi: 3.1.0
+info:
+  title: Finansist API
+  version: '1.0'
+  description: ''
+servers:
+  - url: 'https://api.finansist.app'
+paths:
+  /transactions:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-transactions
+  /protected:
+    get:
+      summary: Protected route
+      tags: []
+      responses:
+        '200':
+          description: OK
+      operationId: get-protected
+      description: Ping protected route
+components:
+  schemas: {}
+  securitySchemes:
+    JWTToken:
+      type: http
+      scheme: bearer
+security:
+  - JWTToken: []
