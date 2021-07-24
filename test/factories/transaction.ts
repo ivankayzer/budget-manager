@@ -3,7 +3,7 @@ import { Transaction } from '../../src/transactions/transaction.entity';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { lorem, random, date, datatype } from 'faker';
 
-export default Factory.define<Transaction>(({ sequence }) => ({
+export default Factory.define<Transaction>(() => ({
   id: null,
   userId: 'fake-user',
   amount: datatype.number(100000),

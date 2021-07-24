@@ -28,7 +28,7 @@ export class Transaction {
   @Column()
   type: string;
 
-  @ManyToOne((type) => Category, {
+  @ManyToOne(() => Category, {
     eager: true,
     onDelete: 'SET NULL',
     nullable: true,

@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AppService } from './app.service';
 
@@ -13,7 +13,7 @@ export class AppController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('/protected')
-  getProtectedHello(@Req() req: JwtRequest): { message: string } {
+  getProtectedHello(): { message: string } {
     return {
       message: 'Hello, you are authenticated.',
     };

@@ -27,11 +27,11 @@ export class Budget {
   @Column()
   amount: number;
 
-  @ManyToMany((type) => Category)
+  @ManyToMany(() => Category)
   @JoinTable()
   categories: Category[];
 
-  @ManyToOne((type) => BudgetScheduler, {
+  @ManyToOne(() => BudgetScheduler, {
     eager: true,
     onDelete: 'SET NULL',
     nullable: true,

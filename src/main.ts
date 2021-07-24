@@ -1,9 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import {
-  DocumentBuilder,
-  SwaggerDocumentOptions,
-  SwaggerModule,
-} from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as helmet from 'helmet';
 import { AppModule } from './app.module';
 

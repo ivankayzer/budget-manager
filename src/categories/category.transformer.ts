@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { EntityTransformer } from '../interfaces/entity-transformer';
 import { Category } from './category.entity';
 
 @Injectable()

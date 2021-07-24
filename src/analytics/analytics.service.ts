@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from '../transactions/transaction.entity';
 import { Repository } from 'typeorm';
+import { TextRow } from './interfaces/text-row';
 
 @Injectable()
 export class AnalyticsService {
