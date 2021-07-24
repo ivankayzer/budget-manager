@@ -1,9 +1,8 @@
-import { IsIn, IsString } from 'class-validator';
+import { IsEnum } from 'class-validator';
+import { UserDto } from '../../auth/dto/user.dto';
+import { BudgetScope } from '../interfaces/budget-scope';
 
-export class DeleteBudgetRequest {
-  @IsString()
-  userId: string;
-
-  @IsIn(['this', 'this-and-upcoming', 'upcoming'])
+export class DeleteBudgetRequest extends UserDto {
+  @IsEnum(BudgetScope)
   delete: BudgetScope;
 }

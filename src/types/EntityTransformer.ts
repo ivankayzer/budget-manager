@@ -1,3 +1,0 @@
-interface EntityTransformer {
-  transform: Function;
-}

@@ -1,12 +1,11 @@
-import { IsIn, IsInt, IsString } from 'class-validator';
+import { IsEnum, IsInt } from 'class-validator';
+import { UserDto } from '../../auth/dto/user.dto';
+import { BudgetScope } from '../interfaces/budget-scope';
 
-export class UpdateBudgetRequest {
-  @IsString()
-  userId: string;
-
+export class UpdateBudgetRequest extends UserDto {
   @IsInt()
   amount: number;
 
-  @IsIn(['this', 'this-and-upcoming', 'upcoming'])
+  @IsEnum(BudgetScope)
   change: BudgetScope;
 }

@@ -1,20 +1,22 @@
 import {
   IsArray,
   IsBoolean,
+  IsEnum,
   IsIn,
   IsInt,
-  IsOptional,
   IsString,
+  ValidateIf,
 } from 'class-validator';
+import { UserDto } from '../../auth/dto/user.dto';
+import { RepeatFrequency } from '../interfaces/repeat-frequency';
 
-export class CreateBudgetRequest {
-  @IsString()
-  userId: string;
-
+export class CreateBudgetRequest extends UserDto {
   @IsString()
   start: string;
 
-  @IsOptional()
+  @ValidateIf(
+    (budget) => !budget.rollover && budget.repeat === RepeatFrequency.none,
+  )
   @IsString()
   end: string;
 
@@ -24,10 +26,9 @@ export class CreateBudgetRequest {
   @IsArray()
   categoryIds: number[];
 
-  @IsOptional()
   @IsBoolean()
-  rollover: boolean | undefined;
+  rollover: boolean;
 
-  @IsIn(['monthly', 'weekly', 'none'])
+  @IsEnum(RepeatFrequency)
   repeat: RepeatFrequency;
 }

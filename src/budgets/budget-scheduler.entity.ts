@@ -4,10 +4,10 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
-  ManyToOne,
   JoinTable,
   ManyToMany,
 } from 'typeorm';
+import { RepeatFrequency } from './interfaces/repeat-frequency';
 
 @Entity()
 export class BudgetScheduler {
@@ -29,7 +29,7 @@ export class BudgetScheduler {
   @Column()
   repeat: RepeatFrequency;
 
-  @ManyToMany((type) => Category)
+  @ManyToMany(() => Category)
   @JoinTable()
   categories: Category[];
 

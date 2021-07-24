@@ -4,10 +4,10 @@ import { BudgetScheduler } from './budget-scheduler.entity';
 import { Budget } from './budget.entity';
 import { BudgetService } from './budget.service';
 import { BudgetTransformer } from './budget.transformer';
-import { CategoryModule } from 'src/categories/category.module';
+import { CategoryModule } from '../categories/category.module';
 import { BudgetController } from './budget.controller';
 import { BudgetSchedulerCalculator } from './budget-scheduler-calculator';
-import { DateCreator } from 'src/date-creator';
+import { DateCreator } from '../date-creator';
 
 @Module({
   imports: [

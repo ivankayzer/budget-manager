@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { BodyWithUserId } from 'src/auth/body-with-user.decorator';
+import { BodyWithUserId } from '../auth/body-with-user.decorator';
 import { BudgetService } from './budget.service';
 import { BudgetTransformer } from './budget.transformer';
 import { CreateBudgetRequest } from './dto/create-budget-request.dto';

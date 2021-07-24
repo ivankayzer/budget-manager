@@ -1,14 +1,19 @@
-import { IsDateString, IsIn, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { UserDto } from '../../auth/dto/user.dto';
+import { TransactionType } from '../../transactions/interfaces/transaction-type';
 
-export class CreateTransactionDto {
-  @IsString()
-  userId: string;
-
+export class CreateTransactionDto extends UserDto {
   @IsInt()
   amount: number;
 
-  @IsIn(['refund', 'income', 'expense'])
-  type: string;
+  @IsEnum(TransactionType)
+  type: TransactionType;
 
   @IsDateString()
   paidAt: string;

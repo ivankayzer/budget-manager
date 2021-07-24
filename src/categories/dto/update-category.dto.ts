@@ -1,9 +1,3 @@
-import { IsString } from "class-validator";
+import { CreateCategoryDto } from './create-category.dto';
 
-export class UpdateCategoryDto {
-    @IsString()
-    name: string;
-
-    @IsString()
-    userId: string;
-}
+export class UpdateCategoryDto extends CreateCategoryDto {}

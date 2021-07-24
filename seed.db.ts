@@ -1,5 +1,5 @@
-import { Category } from 'src/categories/category.entity';
-import { Transaction } from 'src/transactions/transaction.entity';
+import { Category } from './src/categories/category.entity';
+import { Transaction } from './src/transactions/transaction.entity';
 import { getRepository, createConnection } from 'typeorm';
 import categoryFactory from './test/factories/category';
 import transactionFactory from './test/factories/transaction';

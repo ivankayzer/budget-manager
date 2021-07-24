@@ -7,7 +7,6 @@ import { JwtStrategyMock } from '../jwt.strategy.mock';
 import { getRepository } from 'typeorm';
 import { Category } from '../../src/categories/category.entity';
 import categoryFactory from '../factories/category';
-import { format, addMonths } from 'date-fns';
 
 describe('CategoryController (e2e)', () => {
   let app: INestApplication;

@@ -1,6 +1,6 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { DateCreator } from 'src/date-creator';
+import { DateCreator } from '../date-creator';
 import { BodyWithUserId } from '../auth/body-with-user.decorator';
 import { UserDto } from '../auth/dto/user.dto';
 import { AnalyticsService } from './analytics.service';

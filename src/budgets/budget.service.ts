@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CategoryService } from 'src/categories/category.service';
+import { CategoryService } from '../categories/category.service';
 import { Repository } from 'typeorm';
 import { BudgetSchedulerCalculator } from './budget-scheduler-calculator';
 import { BudgetScheduler } from './budget-scheduler.entity';

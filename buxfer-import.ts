@@ -1,8 +1,8 @@
 import { parse } from '@fast-csv/parse';
 import * as fs from 'fs';
 import * as readline from 'readline';
-import { Category } from 'src/categories/category.entity';
-import { Transaction } from 'src/transactions/transaction.entity';
+import { Category } from './src/categories/category.entity';
+import { Transaction } from './src/transactions/transaction.entity';
 import { createConnection, getRepository } from 'typeorm';
 
 const FILE = process.cwd() + '/transactions.csv';

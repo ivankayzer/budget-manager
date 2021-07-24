@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { addMonths, addWeeks, parse } from 'date-fns';
-import { DateCreator } from 'src/date-creator';
+import { DateCreator } from '../date-creator';
+import { RepeatFrequency } from './interfaces/repeat-frequency';
 
 @Injectable()
 export class BudgetSchedulerCalculator {
@@ -10,17 +11,17 @@ export class BudgetSchedulerCalculator {
     repeat: RepeatFrequency,
     start: string,
   ): string | null {
-    if (repeat === 'none') {
+    if (repeat === RepeatFrequency.none) {
       return null;
     }
 
     let date = parse(start, this.dateCreator.getFormat(), new Date());
 
-    if (repeat === 'monthly') {
+    if (repeat === RepeatFrequency.monthly) {
       date = addMonths(date, 1);
     }
 
-    if (repeat === 'weekly') {
+    if (repeat === RepeatFrequency.weekly) {
       date = addWeeks(date, 1);
     }
 

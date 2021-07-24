@@ -24,7 +24,7 @@ export class AnalyticsService {
   public async getIncomeByCategories(userId: string, dates: [string, string]) {
     return await (
       await this.getSumByCategory(userId, 'income', dates)
-    ).map((income: AnalyticsByCategoryTextRow) => {
+    ).map((income: TextRow) => {
       income.total = +income.total;
       return income;
     });
@@ -34,10 +34,9 @@ export class AnalyticsService {
     const expenses = await this.getSumByCategory(userId, 'expense', dates);
     const refunds = await this.getSumByCategory(userId, 'refund', dates);
 
-    return expenses.map((expense: AnalyticsByCategoryTextRow) => {
+    return expenses.map((expense: TextRow) => {
       const refundByCategory = refunds.find(
-        (refund: AnalyticsByCategoryTextRow) =>
-          refund.categoryId === expense.categoryId,
+        (refund: TextRow) => refund.categoryId === expense.categoryId,
       );
 
       if (!refundByCategory) {
@@ -69,7 +68,7 @@ export class AnalyticsService {
     userId: string,
     type: string,
     dates: [string, string],
-  ): Promise<AnalyticsByCategoryTextRow[]> {
+  ): Promise<TextRow[]> {
     const query: string[] = [
       'SELECT categoryId, category.name AS categoryName, SUM(amount) AS total FROM transaction',
       'LEFT JOIN category ON category.id = transaction.categoryId WHERE',
