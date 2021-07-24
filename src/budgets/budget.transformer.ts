@@ -9,7 +9,7 @@ export class BudgetTransformer implements EntityTransformer {
       start: budget.start,
       end: budget.end,
       amount: budget.amount,
-      createdAt: budget.createdAt
+      createdAt: budget.createdAt,
     };
   }
 }

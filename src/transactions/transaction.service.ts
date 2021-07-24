@@ -31,13 +31,16 @@ export class TransactionService {
   async createTransaction(dto: CreateTransactionDto) {
     const transaction = new Transaction();
     transaction.amount = dto.amount;
-    transaction.description = dto.description || "";
+    transaction.description = dto.description || '';
     transaction.userId = dto.userId;
     transaction.paidAt = dto.paidAt;
     transaction.type = dto.type;
 
     if (dto.categoryId) {
-      const category = await this.categoryService.getById(dto.userId, dto.categoryId);
+      const category = await this.categoryService.getById(
+        dto.userId,
+        dto.categoryId,
+      );
       transaction.category = category;
     }
 
@@ -54,12 +57,15 @@ export class TransactionService {
     });
 
     transaction.amount = dto.amount;
-    transaction.description = dto.description || "";
+    transaction.description = dto.description || '';
     transaction.paidAt = dto.paidAt;
     transaction.type = dto.type;
 
     if (dto.categoryId) {
-      const category = await this.categoryService.getById(dto.userId, dto.categoryId);
+      const category = await this.categoryService.getById(
+        dto.userId,
+        dto.categoryId,
+      );
       transaction.category = category;
     }
 

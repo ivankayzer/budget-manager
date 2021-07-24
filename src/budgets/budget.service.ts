@@ -65,7 +65,7 @@ export class BudgetService {
     }
   }
 
-  // @TODO handle case when modifying 'this' from last month. 
+  // @TODO handle case when modifying 'this' from last month.
   // 'upcoming' and 'this-and-upcoming' should change all budgets with id > 'this'
   public async updateBudgetById(id: number, dto: UpdateBudgetRequest) {
     const { userId } = dto;

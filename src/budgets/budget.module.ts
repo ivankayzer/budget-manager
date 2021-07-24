@@ -15,7 +15,12 @@ import { DateCreator } from '../date-creator';
     CategoryModule,
   ],
   controllers: [BudgetController],
-  providers: [BudgetService, BudgetTransformer, DateCreator, BudgetSchedulerCalculator],
+  providers: [
+    BudgetService,
+    BudgetTransformer,
+    DateCreator,
+    BudgetSchedulerCalculator,
+  ],
   exports: [TypeOrmModule],
 })
 export class BudgetModule {}
