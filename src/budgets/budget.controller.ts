@@ -1,12 +1,16 @@
 import {
   Controller,
   Delete,
+  Get,
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { UserDto } from 'src/auth/dto/user.dto';
+import { DateCreator } from 'src/date-creator';
 import { BodyWithUserId } from '../auth/body-with-user.decorator';
 import { BudgetService } from './budget.service';
 import { BudgetTransformer } from './budget.transformer';
@@ -21,6 +25,19 @@ export class BudgetController {
     private readonly budgetService: BudgetService,
     private readonly budgetTransformer: BudgetTransformer,
   ) {}
+
+  @Get()
+  budgets(
+    @BodyWithUserId() dto: UserDto,
+    @Query('start') start?: string,
+    @Query('end') end?: string,
+  ) {
+    return this.budgetService
+      .getBudgetsForDateRange(dto.userId, start, end)
+      .then((budgets) =>
+        budgets.map((budget) => this.budgetTransformer.transform(budget)),
+      );
+  }
 
   @Post()
   create(@BodyWithUserId() dto: CreateBudgetRequest) {

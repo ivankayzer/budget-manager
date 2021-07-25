@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryService } from '../categories/category.service';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { BudgetSchedulerCalculator } from './budget-scheduler-calculator';
 import { BudgetScheduler } from './budget-scheduler.entity';
 import { Budget } from './budget.entity';
 import { CreateBudgetRequest } from './dto/create-budget-request.dto';
 import { DeleteBudgetRequest } from './dto/delete-budget-request.dto';
 import { UpdateBudgetRequest } from './dto/update-budget-request.dto';
+import { DateCreator } from 'src/date-creator';
 
 @Injectable()
 export class BudgetService {
@@ -18,7 +19,23 @@ export class BudgetService {
     private budgetRepository: Repository<Budget>,
     private categoryService: CategoryService,
     private budgetSchedulerCalculator: BudgetSchedulerCalculator,
+    private dateCreator: DateCreator,
   ) {}
+
+  public async getBudgetsForDateRange(
+    userId: string,
+    start?: string,
+    end?: string,
+  ) {
+    return this.budgetRepository.find({
+      where: {
+        userId: userId,
+        // @TODO needs more testing
+        start: Between(...this.dateCreator.createBetween(start, end)),
+        end: Between(...this.dateCreator.createBetween(start, end)),
+      },
+    });
+  }
 
   public async createBudget(dto: CreateBudgetRequest) {
     let scheduler = null;
