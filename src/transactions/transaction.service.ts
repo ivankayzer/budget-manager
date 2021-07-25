@@ -5,8 +5,8 @@ import { Between, DeleteResult, Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './transaction.entity';
-import { format, addMonths } from 'date-fns';
 import { CategoryService } from '../categories/category.service';
+import { DateCreator } from '../date-creator';
 
 @Injectable()
 export class TransactionService {
@@ -14,17 +14,22 @@ export class TransactionService {
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     private categoryService: CategoryService,
+    private dateCreator: DateCreator,
   ) {}
 
-  getTransactionsForCurrentMonth(dto: UserDto): Promise<Transaction[]> {
-    const formatDate = (date) => format(date, 'yyyy-MM-01');
-
-    const date = formatDate(new Date());
-    const nextMonth = formatDate(addMonths(new Date(), 1));
-
+  getTransactionForDateRange(
+    userId: string,
+    start?: string,
+    end?: string,
+  ): Promise<Transaction[]> {
     return this.transactionRepository.find({
-      userId: dto.userId,
-      paidAt: Between(date, nextMonth),
+      order: {
+        paidAt: 'DESC',
+      },
+      where: {
+        userId: userId,
+        paidAt: Between(...this.dateCreator.createBetween(start, end)),
+      },
     });
   }
 

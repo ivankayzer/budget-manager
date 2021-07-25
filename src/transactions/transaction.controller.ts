@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -24,9 +25,13 @@ export class TransactionController {
   ) {}
 
   @Get()
-  getTransactionForCurrentMonth(@BodyWithUserId() dto: UserDto) {
+  getTransactionForCurrentMonth(
+    @BodyWithUserId() dto: UserDto,
+    @Query('start') start?: string,
+    @Query('end') end?: string,
+  ) {
     return this.transactionService
-      .getTransactionsForCurrentMonth(dto)
+      .getTransactionForDateRange(dto.userId, start, end)
       .then((transactions) =>
         transactions.map(this.transactionTransformer.transform),
       );

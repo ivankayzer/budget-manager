@@ -46,7 +46,7 @@ describe('TransactionController (e2e)', () => {
       .expect(({ body }) => expect(body.length).toBe(5));
   });
 
-  it('/ (GET) returns transactions scoped for this month', async () => {
+  it('/ (GET) returns transactions scoped for this month by default', async () => {
     const repo = getRepository(Transaction);
     await repo.save(
       transactionFactory.build({ paidAt: format(new Date(), 'yyyy-MM-15') }),
@@ -61,6 +61,134 @@ describe('TransactionController (e2e)', () => {
       .get('/transactions')
       .expect(200)
       .expect(({ body }) => expect(body.length).toBe(1));
+  });
+
+  it('/ (GET) returns transactions for selected month', async () => {
+    const repo = getRepository(Transaction);
+
+    const currentDate = format(new Date(), 'yyyy-MM-15');
+
+    await Promise.all(
+      transactionFactory
+        .buildList(2, {
+          paidAt: currentDate,
+        })
+        .map((t) => repo.save(t)),
+    );
+
+    await Promise.all(
+      transactionFactory
+        .buildList(3, {
+          paidAt: format(addMonths(new Date(), 1), 'yyyy-MM-15'),
+        })
+        .map((t) => repo.save(t)),
+    );
+
+    return request(app.getHttpServer())
+      .get('/transactions')
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.length).toBe(2);
+        expect(body[0].paidAt).toBe(currentDate);
+        expect(body[1].paidAt).toBe(currentDate);
+      });
+  });
+
+  it('/ (GET) returns transactions for selected year', async () => {
+    const repo = getRepository(Transaction);
+
+    await Promise.all(
+      transactionFactory
+        .buildList(2, {
+          paidAt: '2018-01-15',
+        })
+        .map((t) => repo.save(t)),
+    );
+
+    await Promise.all(
+      transactionFactory
+        .buildList(2, {
+          paidAt: '2019-01-15',
+        })
+        .map((t) => repo.save(t)),
+    );
+
+    return request(app.getHttpServer())
+      .get('/transactions?start=2018&end=2018')
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.length).toBe(2);
+        expect(body[0].paidAt).toBe('2018-01-15');
+        expect(body[1].paidAt).toBe('2018-01-15');
+      });
+  });
+
+  it('/ (GET) returns transactions for selected dates range', async () => {
+    const repo = getRepository(Transaction);
+
+    await Promise.all(
+      transactionFactory
+        .buildList(2, {
+          paidAt: '2018-01-15',
+        })
+        .map((t) => repo.save(t)),
+    );
+
+    await Promise.all(
+      transactionFactory
+        .buildList(3, {
+          paidAt: '2018-01-16',
+        })
+        .map((t) => repo.save(t)),
+    );
+
+    await Promise.all(
+      transactionFactory
+        .buildList(2, {
+          paidAt: '2018-01-17',
+        })
+        .map((t) => repo.save(t)),
+    );
+
+    return request(app.getHttpServer())
+      .get('/transactions?start=2018-01-15&end=2018-01-16')
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.length).toBe(5);
+        expect(body[0].paidAt).toBe('2018-01-16');
+        expect(body[1].paidAt).toBe('2018-01-16');
+        expect(body[2].paidAt).toBe('2018-01-16');
+        expect(body[3].paidAt).toBe('2018-01-15');
+      });
+  });
+
+  it('/ (GET) returns transactions ordered descending by `paidAt`', async () => {
+    const repo = getRepository(Transaction);
+
+    await Promise.all(
+      transactionFactory
+        .buildList(1, {
+          paidAt: '2018-01-14',
+        })
+        .map((t) => repo.save(t)),
+    );
+
+    await Promise.all(
+      transactionFactory
+        .buildList(1, {
+          paidAt: '2018-01-15',
+        })
+        .map((t) => repo.save(t)),
+    );
+
+    return request(app.getHttpServer())
+      .get('/transactions?start=2018&end=2018')
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.length).toBe(2);
+        expect(body[0].paidAt).toBe('2018-01-15');
+        expect(body[1].paidAt).toBe('2018-01-14');
+      });
   });
 
   it('/ (POST) creates a transaction and returns created transaction', async () => {
@@ -95,6 +223,35 @@ describe('TransactionController (e2e)', () => {
       });
   });
 
+  it('/ (POST) will fail validation if you provide wrong `amount`', async () => {
+    return request(app.getHttpServer())
+      .post('/transactions')
+      .send({
+        paidAt: '2020-01-01',
+        type: 'expense',
+        description: 'Fake description',
+        amount: 'Wrong amount',
+      })
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('amount');
+      });
+  });
+
+  it('/ (POST) will fail validation if you dont provide `type`', async () => {
+    return request(app.getHttpServer())
+      .post('/transactions')
+      .send({
+        amount: 500,
+        paidAt: '2020-01-01',
+        description: 'Fake description',
+      })
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('type');
+      });
+  });
+
   it('/ (POST) will fail validation if you provide wrong `type`', async () => {
     return request(app.getHttpServer())
       .post('/transactions')
@@ -102,6 +259,7 @@ describe('TransactionController (e2e)', () => {
         amount: 500,
         paidAt: '2020-01-01',
         description: 'Fake description',
+        type: 'Wrong type',
       })
       .expect(400)
       .expect(({ body }) => {
@@ -116,6 +274,21 @@ describe('TransactionController (e2e)', () => {
         amount: 500,
         type: 'expense',
         description: 'Fake description',
+      })
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('paidAt');
+      });
+  });
+
+  it('/ (POST) will fail validation if you provide `paidAt` in wrong format', async () => {
+    return request(app.getHttpServer())
+      .post('/transactions')
+      .send({
+        amount: 500,
+        type: 'expense',
+        description: 'Fake description',
+        paidAt: '1-1-1-1-1',
       })
       .expect(400)
       .expect(({ body }) => {
