@@ -7,6 +7,7 @@ import { JwtStrategyMock } from '../jwt.strategy.mock';
 import { getRepository } from 'typeorm';
 import { Category } from '../../src/categories/category.entity';
 import categoryFactory from '../factories/category';
+import { TypeOrmFilter } from './../../src/typeorm.filter';
 
 describe('CategoryController (e2e)', () => {
   let app: INestApplication;
@@ -20,6 +21,7 @@ describe('CategoryController (e2e)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalFilters(new TypeOrmFilter());
     await app.init();
   });
 
@@ -60,10 +62,26 @@ describe('CategoryController (e2e)', () => {
     return request(app.getHttpServer())
       .post('/categories')
       .send({})
-      .expect(400)
+      .expect(422)
       .expect(({ body }) => {
         expect(body.message[0].field).toBe('name');
       });
+  });
+
+  it('/ (POST) will fail validation if you will provide same `name` twice', async () => {
+    await request(app.getHttpServer())
+      .post('/categories')
+      .send({
+        name: 'Fake name',
+      })
+      .expect(201);
+
+    return request(app.getHttpServer())
+      .post('/categories')
+      .send({
+        name: 'Fake name',
+      })
+      .expect(422);
   });
 
   it('/:id (PATCH) updates a category and returns updated category', async () => {

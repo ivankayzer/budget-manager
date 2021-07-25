@@ -217,7 +217,7 @@ describe('TransactionController (e2e)', () => {
         type: 'expense',
         description: 'Fake description',
       })
-      .expect(400)
+      .expect(422)
       .expect(({ body }) => {
         expect(body.message[0].field).toBe('amount');
       });
@@ -232,7 +232,7 @@ describe('TransactionController (e2e)', () => {
         description: 'Fake description',
         amount: 'Wrong amount',
       })
-      .expect(400)
+      .expect(422)
       .expect(({ body }) => {
         expect(body.message[0].field).toBe('amount');
       });
@@ -246,7 +246,7 @@ describe('TransactionController (e2e)', () => {
         paidAt: '2020-01-01',
         description: 'Fake description',
       })
-      .expect(400)
+      .expect(422)
       .expect(({ body }) => {
         expect(body.message[0].field).toBe('type');
       });
@@ -261,7 +261,7 @@ describe('TransactionController (e2e)', () => {
         description: 'Fake description',
         type: 'Wrong type',
       })
-      .expect(400)
+      .expect(422)
       .expect(({ body }) => {
         expect(body.message[0].field).toBe('type');
       });
@@ -275,7 +275,7 @@ describe('TransactionController (e2e)', () => {
         type: 'expense',
         description: 'Fake description',
       })
-      .expect(400)
+      .expect(422)
       .expect(({ body }) => {
         expect(body.message[0].field).toBe('paidAt');
       });
@@ -290,7 +290,7 @@ describe('TransactionController (e2e)', () => {
         description: 'Fake description',
         paidAt: '1-1-1-1-1',
       })
-      .expect(400)
+      .expect(422)
       .expect(({ body }) => {
         expect(body.message[0].field).toBe('paidAt');
       });
