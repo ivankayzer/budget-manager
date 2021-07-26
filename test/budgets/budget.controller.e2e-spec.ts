@@ -87,9 +87,7 @@ describe('BudgetController (e2e)', () => {
       .expect(({ body }) => expect(body.length).toBe(3));
   });
 
-  // rollover + repeat + end date should not be possible
-
-  it('/ (POST) end date should be greater than start', async () => {
+  it('/ (POST) `end` date should be greater than `start`', async () => {
     return request(app.getHttpServer())
       .post('/budgets')
       .send({
@@ -106,7 +104,7 @@ describe('BudgetController (e2e)', () => {
       });
   });
 
-  it('/ (POST) end date cant be used with rollover', async () => {
+  it('/ (POST) `end` date cant be used with `rollover`', async () => {
     return request(app.getHttpServer())
       .post('/budgets')
       .send({
@@ -123,7 +121,7 @@ describe('BudgetController (e2e)', () => {
       });
   });
 
-  it('/ (POST) end date cant be used with repeat field', async () => {
+  it('/ (POST) `end` date cant be used with `repeat` field', async () => {
     return request(app.getHttpServer())
       .post('/budgets')
       .send({
@@ -137,6 +135,131 @@ describe('BudgetController (e2e)', () => {
       .expect(422)
       .expect(({ body }) => {
         expect(body.message[0].field).toBe('end');
+      });
+  });
+
+  it('/ (POST) `end` should be a date string if provided', async () => {
+    return request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-02',
+        end: 'wrong date',
+        amount: 1000,
+        categoryIds: [],
+        rollover: false,
+        repeat: RepeatFrequency.none,
+      })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('end');
+      });
+  });
+
+  it('/ (POST) `repeat` cant be `none` if no end date provided', async () => {
+    return request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-02',
+        amount: 1000,
+        categoryIds: [],
+        rollover: false,
+        repeat: RepeatFrequency.none,
+      })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('repeat');
+      });
+  });
+
+  it('/ (POST) `start` should be a date string', async () => {
+    return request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: 'wrong date',
+        amount: 1000,
+        categoryIds: [],
+        rollover: true,
+        repeat: RepeatFrequency.none,
+      })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('start');
+      });
+  });
+
+  it('/ (POST) `amount` is required', async () => {
+    return request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-02',
+        categoryIds: [],
+        rollover: false,
+        repeat: RepeatFrequency.monthly,
+      })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('amount');
+      });
+  });
+
+  it('/ (POST) `amount` should be greater than zero', async () => {
+    return request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-02',
+        categoryIds: [],
+        rollover: false,
+        amount: -100,
+        repeat: RepeatFrequency.monthly,
+      })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('amount');
+      });
+  });
+
+  it('/ (POST) `categoryIds` is required', async () => {
+    return request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-02',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.monthly,
+      })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('categoryIds');
+      });
+  });
+
+  it('/ (POST) `rollover` is required', async () => {
+    return request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-02',
+        amount: 1000,
+        categoryIds: [],
+        repeat: RepeatFrequency.monthly,
+      })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('rollover');
+      });
+  });
+
+  it('/ (POST) `repeat` is required', async () => {
+    return request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-02',
+        rollover: false,
+        amount: 1000,
+        categoryIds: [],
+      })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message[0].field).toBe('repeat');
       });
   });
 });

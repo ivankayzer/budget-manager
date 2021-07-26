@@ -30,6 +30,9 @@ export class CreateBudgetRequest extends UserDto {
   @IsDateString()
   end: string;
 
+  @Validate((value) => value > 0, {
+    message: 'should be greater than zero',
+  })
   @IsInt()
   amount: number;
 
@@ -39,6 +42,11 @@ export class CreateBudgetRequest extends UserDto {
   @IsBoolean()
   rollover: boolean;
 
+  @Validate(
+    (value, args: CreateBudgetRequest) =>
+      !args.end && value !== RepeatFrequency.none,
+    { message: "can't be none when using without end date" },
+  )
   @IsEnum(RepeatFrequency)
   repeat: RepeatFrequency;
 }
