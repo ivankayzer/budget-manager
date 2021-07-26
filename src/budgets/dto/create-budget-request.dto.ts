@@ -1,22 +1,33 @@
 import {
   IsArray,
   IsBoolean,
+  IsDateString,
   IsEnum,
   IsInt,
-  IsString,
-  ValidateIf,
+  IsOptional,
 } from 'class-validator';
 import { UserDto } from '../../auth/dto/user.dto';
 import { RepeatFrequency } from '../interfaces/repeat-frequency';
+import { Validate } from '../../custom-validator';
 
 export class CreateBudgetRequest extends UserDto {
-  @IsString()
+  @IsDateString()
   start: string;
 
-  @ValidateIf(
-    (budget) => !budget.rollover && budget.repeat === RepeatFrequency.none,
+  @Validate(
+    (value, args: CreateBudgetRequest) => value && args.start < args.end,
+    { message: "can't be before start date" },
   )
-  @IsString()
+  @Validate((value, args: CreateBudgetRequest) => value && !args.rollover, {
+    message: "can't be used with rollover",
+  })
+  @Validate(
+    (value, args: CreateBudgetRequest) =>
+      value && args.repeat === RepeatFrequency.none,
+    { message: "can't be used with repeat" },
+  )
+  @IsOptional()
+  @IsDateString()
   end: string;
 
   @IsInt()

@@ -20,7 +20,9 @@ export class ValidationPipe implements PipeTransform<any> {
         errors.map((error) => ({
           field: error.property,
           errors: Object.values(error.constraints).map((constraint) =>
-            constraint.substr(error.property.length + 1),
+            constraint.substr(0, error.property.length) === error.property
+              ? constraint.substr(error.property.length + 1)
+              : constraint,
           ),
         })),
       );

@@ -8,7 +8,7 @@ import { Budget } from './budget.entity';
 import { CreateBudgetRequest } from './dto/create-budget-request.dto';
 import { DeleteBudgetRequest } from './dto/delete-budget-request.dto';
 import { UpdateBudgetRequest } from './dto/update-budget-request.dto';
-import { DateCreator } from 'src/date-creator';
+import { DateCreator } from '../date-creator';
 
 @Injectable()
 export class BudgetService {
@@ -28,12 +28,13 @@ export class BudgetService {
     end?: string,
   ) {
     return this.budgetRepository.find({
-      where: {
-        userId: userId,
-        // @TODO needs more testing
-        start: Between(...this.dateCreator.createBetween(start, end)),
-        end: Between(...this.dateCreator.createBetween(start, end)),
-      },
+      where: [
+        {
+          start: Between(...this.dateCreator.createBetween(start, end)),
+          userId,
+        },
+        { end: Between(...this.dateCreator.createBetween(start, end)), userId },
+      ],
     });
   }
 
@@ -82,8 +83,8 @@ export class BudgetService {
     }
   }
 
-  // @TODO handle case when modifying 'this' from last month.
-  // 'upcoming' and 'this-and-upcoming' should change all budgets with id > 'this'
+  // @TODO handle case when modifying 'this-and-upcoming' from last month.
+  // it should change all budgets with id > 'this'
   public async updateBudgetById(id: number, dto: UpdateBudgetRequest) {
     const { userId } = dto;
 
