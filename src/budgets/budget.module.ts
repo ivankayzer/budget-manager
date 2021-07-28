@@ -8,6 +8,7 @@ import { CategoryModule } from '../categories/category.module';
 import { BudgetController } from './budget.controller';
 import { BudgetSchedulerCalculator } from './budget-scheduler-calculator';
 import { DateCreator } from '../date-creator';
+import { BudgetCron } from './budget.cron';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { DateCreator } from '../date-creator';
   controllers: [BudgetController],
   providers: [
     BudgetService,
+    BudgetCron,
     BudgetTransformer,
     DateCreator,
     BudgetSchedulerCalculator,

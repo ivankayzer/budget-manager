@@ -66,4 +66,8 @@ export class DateCreator {
   public getFormat(): string {
     return 'yyyy-MM-dd';
   }
+
+  public today(): string {
+    return this.format(new Date());
+  }
 }

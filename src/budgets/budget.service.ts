@@ -9,6 +9,7 @@ import { CreateBudgetRequest } from './dto/create-budget-request.dto';
 import { DeleteBudgetRequest } from './dto/delete-budget-request.dto';
 import { UpdateBudgetRequest } from './dto/update-budget-request.dto';
 import { DateCreator } from '../date-creator';
+import { ScheduledBudgetRow } from './interfaces/scheduled-budget-row';
 
 @Injectable()
 export class BudgetService {
@@ -143,6 +144,12 @@ export class BudgetService {
     }
 
     return budget;
+  }
+
+  public getScheduledBudgetsMaxDates(): Promise<ScheduledBudgetRow[]> {
+    return this.budgetRepository.query(
+      'SELECT MAX(budget.id) AS budgetId, schedulerId, MAX(`end`) AS maxEnd, budget_scheduler.repeat FROM budget LEFT JOIN budget_scheduler ON budget_scheduler.id = budget.schedulerId GROUP BY schedulerId;',
+    );
   }
 
   private async createScheduledBudget(dto: CreateBudgetRequest) {

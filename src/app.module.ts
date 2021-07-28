@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { AppController } from './app.controller';
@@ -17,6 +18,7 @@ import { TransactionModule } from './transactions/transaction.module';
     AnalyticsModule,
     BudgetModule,
     TypeOrmModule.forRoot(),
+    ScheduleModule.forRoot()
   ],
   controllers: [AppController],
   providers: [AppService, DateCreator],
