@@ -9,6 +9,7 @@ import { getRepository } from 'typeorm';
 import { addMonths, format } from 'date-fns';
 import { Budget as budgetFactory } from '../factories/budget';
 import { RepeatFrequency } from '../../src/budgets/interfaces/repeat-frequency';
+import { BudgetScope } from '../../src/budgets/interfaces/budget-scope';
 
 describe('BudgetController (e2e)', () => {
   let app: INestApplication;
@@ -261,5 +262,102 @@ describe('BudgetController (e2e)', () => {
       .expect(({ body }) => {
         expect(body.message[0].field).toBe('repeat');
       });
+  });
+
+  it('/ (POST) creates a budget with an end date', async () => {
+    await request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-01',
+        end: '2018-01-31',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.none,
+        categoryIds: [],
+      })
+      .expect(201);
+
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne({
+      where: {
+        amount: 1000,
+        start: '2018-01-01',
+        end: '2018-01-31',
+      },
+    });
+
+    expect(budget.id).toBe(1);
+  });
+
+  it('/:id (PATCH) updates a budget with type `this`', async () => {
+    await request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-01',
+        end: '2018-01-31',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.none,
+        categoryIds: [],
+      })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .patch('/budgets/1')
+      .send({
+        amount: 1010,
+        change: BudgetScope.this,
+      })
+      .expect(200);
+
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne(1);
+
+    expect(budget.amount).toBe(1010);
+  });
+
+  it('/:id (PATCH) will throw 404 if trying to update non existing record', async () => {
+    await request(app.getHttpServer())
+      .patch('/budgets/5')
+      .send({
+        amount: 1010,
+        change: BudgetScope.this,
+      })
+      .expect(404);
+  });
+
+  it('/:id (DELETE) deletes a budget with type `this`', async () => {
+    await request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-01',
+        end: '2018-01-31',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.none,
+        categoryIds: [],
+      })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .delete('/budgets/1')
+      .send({
+        delete: BudgetScope.this,
+      })
+      .expect(200);
+
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne(1);
+
+    expect(budget).toBe(undefined);
+  });
+
+  it('/:id (DELETE) will throw 404 if trying to delete non existing record', async () => {
+    await request(app.getHttpServer())
+      .delete('/budgets/5')
+      .send({
+        delete: BudgetScope.this,
+      })
+      .expect(404);
   });
 });

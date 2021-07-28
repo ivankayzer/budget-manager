@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryService } from '../categories/category.service';
-import { Between, Repository } from 'typeorm';
+import { Between, MoreThan, Repository } from 'typeorm';
 import { BudgetSchedulerCalculator } from './budget-scheduler-calculator';
 import { BudgetScheduler } from './budget-scheduler.entity';
 import { Budget } from './budget.entity';
@@ -61,30 +61,42 @@ export class BudgetService {
       id,
       userId,
     });
-    const schedulerId = budget.scheduler.id;
+
+    if (!budget) {
+      throw new NotFoundException();
+    }
+
+    const schedulerId = budget.scheduler?.id;
 
     switch (dto.delete) {
       case 'this':
         this.budgetRepository.delete({ id, userId });
         break;
       case 'upcoming':
-        this.budgetSchedulerRepository.delete({
-          id: schedulerId,
-          userId,
-        });
+        if (schedulerId) {
+          this.budgetSchedulerRepository.delete({
+            id: schedulerId,
+            userId,
+          });
+        }
         break;
       case 'this-and-upcoming':
-        this.budgetRepository.delete({ id, userId });
-        this.budgetSchedulerRepository.delete({
-          id: schedulerId,
+        this.budgetRepository.delete({
           userId,
+          scheduler: budget.scheduler,
+          id: MoreThan(id),
         });
+        this.budgetRepository.delete({ id, userId });
+        if (schedulerId) {
+          this.budgetSchedulerRepository.delete({
+            id: schedulerId,
+            userId,
+          });
+        }
         break;
     }
   }
 
-  // @TODO handle case when modifying 'this-and-upcoming' from last month.
-  // it should change all budgets with id > 'this'
   public async updateBudgetById(id: number, dto: UpdateBudgetRequest) {
     const { userId } = dto;
 
@@ -92,6 +104,11 @@ export class BudgetService {
       id,
       userId,
     });
+
+    if (!budget) {
+      throw new NotFoundException();
+    }
+
     const scheduler = budget.scheduler;
 
     switch (dto.change) {
@@ -100,14 +117,28 @@ export class BudgetService {
         this.budgetRepository.save(budget);
         break;
       case 'upcoming':
-        scheduler.amount = dto.amount;
-        this.budgetSchedulerRepository.save(scheduler);
+        if (scheduler) {
+          scheduler.amount = dto.amount;
+          this.budgetSchedulerRepository.save(scheduler);
+        }
         break;
       case 'this-and-upcoming':
+        this.budgetRepository.update(
+          {
+            userId,
+            scheduler,
+            id: MoreThan(id),
+          },
+          {
+            amount: dto.amount,
+          },
+        );
         budget.amount = dto.amount;
         this.budgetRepository.save(budget);
-        scheduler.amount = dto.amount;
-        this.budgetSchedulerRepository.save(scheduler);
+        if (scheduler) {
+          scheduler.amount = dto.amount;
+          this.budgetSchedulerRepository.save(scheduler);
+        }
         break;
     }
 

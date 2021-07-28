@@ -54,6 +54,6 @@ export class BudgetController {
 
   @Delete(':id')
   delete(@BodyWithUserId() dto: DeleteBudgetRequest, @Param('id') id: number) {
-    this.budgetService.deleteBudgetById(id, dto);
+    return this.budgetService.deleteBudgetById(id, dto);
   }
 }
