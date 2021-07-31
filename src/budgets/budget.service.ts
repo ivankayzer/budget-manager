@@ -77,25 +77,30 @@ export class BudgetService {
 
     switch (dto.delete) {
       case BudgetScope.this:
-        this.budgetRepository.delete({ id, userId });
+        await this.budgetRepository.delete({ id, userId });
         break;
       case BudgetScope.upcoming:
+        await this.budgetRepository.delete({
+          userId,
+          scheduler: budget.scheduler,
+          id: MoreThan(id),
+        });
         if (schedulerId) {
-          this.budgetSchedulerRepository.delete({
+          await this.budgetSchedulerRepository.delete({
             id: schedulerId,
             userId,
           });
         }
         break;
       case BudgetScope.thisAndUpcoming:
-        this.budgetRepository.delete({
+        await this.budgetRepository.delete({
           userId,
           scheduler: budget.scheduler,
           id: MoreThan(id),
         });
-        this.budgetRepository.delete({ id, userId });
+        await this.budgetRepository.delete({ id, userId });
         if (schedulerId) {
-          this.budgetSchedulerRepository.delete({
+          await this.budgetSchedulerRepository.delete({
             id: schedulerId,
             userId,
           });
@@ -124,13 +129,23 @@ export class BudgetService {
         await this.budgetRepository.save(budget);
         break;
       case BudgetScope.upcoming:
+        await this.budgetRepository.update(
+          {
+            userId,
+            scheduler,
+            id: MoreThan(id),
+          },
+          {
+            amount: dto.amount,
+          },
+        );
         if (scheduler) {
           scheduler.amount = dto.amount;
           await this.budgetSchedulerRepository.save(scheduler);
         }
         break;
       case BudgetScope.thisAndUpcoming:
-        this.budgetRepository.update(
+        await this.budgetRepository.update(
           {
             userId,
             scheduler,
@@ -158,11 +173,14 @@ export class BudgetService {
         'SELECT MAX(budget.id) AS budgetId, schedulerId, MAX(`end`) AS maxEnd, budget_scheduler.repeat FROM budget LEFT JOIN budget_scheduler ON budget_scheduler.id = budget.schedulerId GROUP BY schedulerId;',
       )
       .then((budgets: ScheduledBudgetRow[]) =>
-        budgets.filter(
-          (budget: ScheduledBudgetRow) =>
-            this.dateCreator.format(addDays(budget.maxEnd, 1)) ===
-            this.dateCreator.today(),
-        ),
+        budgets
+          .map((budget) => {
+            return budget;
+          })
+          .filter(
+            (budget: ScheduledBudgetRow) =>
+              this.dateCreator.format(budget.maxEnd) < this.dateCreator.today(),
+          ),
       );
   }
 

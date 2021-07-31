@@ -29,7 +29,9 @@ export class BudgetScheduler {
   @Column()
   repeat: RepeatFrequency;
 
-  @ManyToMany(() => Category)
+  @ManyToMany(() => Category, {
+    eager: true,
+  })
   @JoinTable()
   categories: Category[];
 

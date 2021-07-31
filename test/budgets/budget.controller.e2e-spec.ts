@@ -10,6 +10,7 @@ import { addMonths, format } from 'date-fns';
 import { Budget as budgetFactory } from '../factories/budget';
 import { RepeatFrequency } from '../../src/budgets/interfaces/repeat-frequency';
 import { BudgetScope } from '../../src/budgets/interfaces/budget-scope';
+import { Category } from '../../src/categories/category.entity';
 import { BudgetScheduler } from '../../src/budgets/budget-scheduler.entity';
 
 describe('BudgetController (e2e)', () => {
@@ -396,6 +397,16 @@ describe('BudgetController (e2e)', () => {
       })
       .expect(201);
 
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne(1);
+    const secondBudget = new Budget();
+    secondBudget.start = budget.start;
+    secondBudget.end = budget.end;
+    secondBudget.amount = budget.amount;
+    secondBudget.scheduler = budget.scheduler;
+    secondBudget.userId = budget.userId;
+    await repo.save(secondBudget);
+
     await request(app.getHttpServer())
       .patch('/budgets/1')
       .send({
@@ -404,11 +415,11 @@ describe('BudgetController (e2e)', () => {
       })
       .expect(200);
 
-    const repo = getRepository(Budget);
-    const budget = await repo.findOne(1);
-
-    expect(budget.amount).toBe(1010);
-    expect(budget.scheduler.amount).toBe(1010);
+    const budget1 = await repo.findOne(1);
+    const budget2 = await repo.findOne(2);
+    expect(budget1.amount).toBe(1010);
+    expect(budget2.amount).toBe(1010);
+    expect(budget1.scheduler.amount).toBe(1010);
   });
 
   it('/:id (PATCH) updates amount in a budget scheduler with type `upcoming`', async () => {
@@ -423,6 +434,16 @@ describe('BudgetController (e2e)', () => {
       })
       .expect(201);
 
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne(1);
+    const secondBudget = new Budget();
+    secondBudget.start = budget.start;
+    secondBudget.end = budget.end;
+    secondBudget.amount = budget.amount;
+    secondBudget.scheduler = budget.scheduler;
+    secondBudget.userId = budget.userId;
+    await repo.save(secondBudget);
+
     await request(app.getHttpServer())
       .patch('/budgets/1')
       .send({
@@ -431,18 +452,151 @@ describe('BudgetController (e2e)', () => {
       })
       .expect(200);
 
-    const repo = getRepository(Budget);
-    const budget = await repo.findOne(1);
-
-    expect(budget.amount).toBe(1000);
-    expect(budget.scheduler.amount).toBe(1010);
+    const budget1 = await repo.findOne(1);
+    const budget2 = await repo.findOne(2);
+    expect(budget1.amount).toBe(1000);
+    expect(budget2.amount).toBe(1010);
+    expect(budget1.scheduler.amount).toBe(1010);
   });
 
   it('/ (POST) creates a scheduled budget and a normal budget with categories', async () => {
-    expect(true).toBe(false);
+    const categoryRepository = getRepository(Category);
+    const category1 = new Category();
+    category1.userId = 'fake-user';
+    category1.name = 'fake-1';
+
+    const category2 = new Category();
+    category2.userId = 'fake-user';
+    category2.name = 'fake-2';
+
+    await categoryRepository.save(category1);
+    await categoryRepository.save(category2);
+
+    await request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-01',
+        end: '2018-01-31',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.none,
+        categoryIds: [category1.id, category2.id],
+      })
+      .expect(201);
+
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne(1);
+
+    expect(budget.categories.map((category) => category.id)).toStrictEqual([
+      1, 2,
+    ]);
   });
-  
+
   it('/ (POST) creates a budget with categories', async () => {
-    expect(true).toBe(false);
+    const categoryRepository = getRepository(Category);
+    const category1 = new Category();
+    category1.userId = 'fake-user';
+    category1.name = 'fake-1';
+
+    const category2 = new Category();
+    category2.userId = 'fake-user';
+    category2.name = 'fake-2';
+
+    await categoryRepository.save(category1);
+    await categoryRepository.save(category2);
+
+    await request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-01',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.monthly,
+        categoryIds: [category1.id, category2.id],
+      })
+      .expect(201);
+
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne(1);
+
+    expect(budget.categories.map((category) => category.id)).toStrictEqual([
+      1, 2,
+    ]);
+
+    expect(
+      budget.scheduler.categories.map((category) => category.id),
+    ).toStrictEqual([1, 2]);
+  });
+
+  it('/:id (DELETE) deletes a budget scheduler with type `upcoming`', async () => {
+    await request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-01',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.monthly,
+        categoryIds: [],
+      })
+      .expect(201);
+
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne(1);
+    const secondBudget = new Budget();
+    secondBudget.start = budget.start;
+    secondBudget.end = budget.end;
+    secondBudget.amount = budget.amount;
+    secondBudget.scheduler = budget.scheduler;
+    secondBudget.userId = budget.userId;
+    await repo.save(secondBudget);
+
+    await request(app.getHttpServer())
+      .delete('/budgets/1')
+      .send({
+        delete: BudgetScope.upcoming,
+      })
+      .expect(200);
+
+    const budget1 = await repo.findOne(1);
+    const budget2 = await repo.findOne(2);
+
+    expect(budget1.scheduler).toBe(null);
+    expect(budget2).toBe(undefined);
+  });
+
+  it('/:id (DELETE) deletes a budget with type `this-and-upcoming`', async () => {
+    await request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-01',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.monthly,
+        categoryIds: [],
+      })
+      .expect(201);
+
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne(1);
+    const secondBudget = new Budget();
+    secondBudget.start = budget.start;
+    secondBudget.end = budget.end;
+    secondBudget.amount = budget.amount;
+    secondBudget.scheduler = budget.scheduler;
+    secondBudget.userId = budget.userId;
+    await repo.save(secondBudget);
+
+    await request(app.getHttpServer())
+      .delete('/budgets/1')
+      .send({
+        delete: BudgetScope.thisAndUpcoming,
+      })
+      .expect(200);
+
+    const budget1 = await repo.findOne(1);
+    const budget2 = await repo.findOne(2);
+
+    expect(budget1).toBe(undefined);
+    expect(budget2).toBe(undefined);
   });
 });

@@ -27,7 +27,9 @@ export class Budget {
   @Column()
   amount: number;
 
-  @ManyToMany(() => Category)
+  @ManyToMany(() => Category, {
+    eager: true,
+  })
   @JoinTable()
   categories: Category[];
 
