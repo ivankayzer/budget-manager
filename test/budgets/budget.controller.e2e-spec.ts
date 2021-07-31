@@ -10,6 +10,7 @@ import { addMonths, format } from 'date-fns';
 import { Budget as budgetFactory } from '../factories/budget';
 import { RepeatFrequency } from '../../src/budgets/interfaces/repeat-frequency';
 import { BudgetScope } from '../../src/budgets/interfaces/budget-scope';
+import { BudgetScheduler } from '../../src/budgets/budget-scheduler.entity';
 
 describe('BudgetController (e2e)', () => {
   let app: INestApplication;
@@ -359,5 +360,89 @@ describe('BudgetController (e2e)', () => {
         delete: BudgetScope.this,
       })
       .expect(404);
+  });
+
+  it('/ (POST) creates a scheduled budget and a normal budget', async () => {
+    await request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-01',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.monthly,
+        categoryIds: [],
+      })
+      .expect(201);
+
+    const budgetsRepo = getRepository(Budget);
+    const budget = await budgetsRepo.findOne(1);
+
+    expect(budget.amount).toBe(1000);
+    expect(budget.start).toBe('2018-01-01');
+    expect(budget.end).toBe('2018-01-31');
+    expect(budget.scheduler.amount).toBe(1000);
+    expect(budget.scheduler.repeat).toBe(RepeatFrequency.monthly);
+  });
+
+  it('/:id (PATCH) updates amount in a budget with type `this-and-upcoming`', async () => {
+    await request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-01',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.monthly,
+        categoryIds: [],
+      })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .patch('/budgets/1')
+      .send({
+        amount: 1010,
+        change: BudgetScope.thisAndUpcoming,
+      })
+      .expect(200);
+
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne(1);
+
+    expect(budget.amount).toBe(1010);
+    expect(budget.scheduler.amount).toBe(1010);
+  });
+
+  it('/:id (PATCH) updates amount in a budget scheduler with type `upcoming`', async () => {
+    await request(app.getHttpServer())
+      .post('/budgets')
+      .send({
+        start: '2018-01-01',
+        rollover: false,
+        amount: 1000,
+        repeat: RepeatFrequency.monthly,
+        categoryIds: [],
+      })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .patch('/budgets/1')
+      .send({
+        amount: 1010,
+        change: BudgetScope.upcoming,
+      })
+      .expect(200);
+
+    const repo = getRepository(Budget);
+    const budget = await repo.findOne(1);
+
+    expect(budget.amount).toBe(1000);
+    expect(budget.scheduler.amount).toBe(1010);
+  });
+
+  it('/ (POST) creates a scheduled budget and a normal budget with categories', async () => {
+    expect(true).toBe(false);
+  });
+  
+  it('/ (POST) creates a budget with categories', async () => {
+    expect(true).toBe(false);
   });
 });

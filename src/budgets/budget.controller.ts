@@ -49,6 +49,7 @@ export class BudgetController {
   update(@BodyWithUserId() dto: UpdateBudgetRequest, @Param('id') id: number) {
     return this.budgetService
       .updateBudgetById(id, dto)
+      .then(() => this.budgetService.findById(id))
       .then((budget) => this.budgetTransformer.transform(budget));
   }
 

@@ -44,7 +44,8 @@ export class CreateBudgetRequest extends UserDto {
 
   @Validate(
     (value, args: CreateBudgetRequest) =>
-      args.end && value === RepeatFrequency.none,
+      (!args.end && value !== RepeatFrequency.none) ||
+      (args.end && value === RepeatFrequency.none),
     { message: "can't be none when using without end date" },
   )
   @IsEnum(RepeatFrequency)

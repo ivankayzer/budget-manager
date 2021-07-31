@@ -10,6 +10,8 @@ import { DeleteBudgetRequest } from './dto/delete-budget-request.dto';
 import { UpdateBudgetRequest } from './dto/update-budget-request.dto';
 import { DateCreator } from '../date-creator';
 import { ScheduledBudgetRow } from './interfaces/scheduled-budget-row';
+import { addDays } from 'date-fns';
+import { BudgetScope } from './interfaces/budget-scope';
 
 @Injectable()
 export class BudgetService {
@@ -37,6 +39,10 @@ export class BudgetService {
         { end: Between(...this.dateCreator.createBetween(start, end)), userId },
       ],
     });
+  }
+
+  public async findById(id: number): Promise<Budget> {
+    return this.budgetRepository.findOne(id);
   }
 
   public async createBudget(dto: CreateBudgetRequest) {
@@ -70,10 +76,10 @@ export class BudgetService {
     const schedulerId = budget.scheduler?.id;
 
     switch (dto.delete) {
-      case 'this':
+      case BudgetScope.this:
         this.budgetRepository.delete({ id, userId });
         break;
-      case 'upcoming':
+      case BudgetScope.upcoming:
         if (schedulerId) {
           this.budgetSchedulerRepository.delete({
             id: schedulerId,
@@ -81,7 +87,7 @@ export class BudgetService {
           });
         }
         break;
-      case 'this-and-upcoming':
+      case BudgetScope.thisAndUpcoming:
         this.budgetRepository.delete({
           userId,
           scheduler: budget.scheduler,
@@ -113,17 +119,17 @@ export class BudgetService {
     const scheduler = budget.scheduler;
 
     switch (dto.change) {
-      case 'this':
+      case BudgetScope.this:
         budget.amount = dto.amount;
-        this.budgetRepository.save(budget);
+        await this.budgetRepository.save(budget);
         break;
-      case 'upcoming':
+      case BudgetScope.upcoming:
         if (scheduler) {
           scheduler.amount = dto.amount;
-          this.budgetSchedulerRepository.save(scheduler);
+          await this.budgetSchedulerRepository.save(scheduler);
         }
         break;
-      case 'this-and-upcoming':
+      case BudgetScope.thisAndUpcoming:
         this.budgetRepository.update(
           {
             userId,
@@ -135,21 +141,29 @@ export class BudgetService {
           },
         );
         budget.amount = dto.amount;
-        this.budgetRepository.save(budget);
+        await this.budgetRepository.save(budget);
         if (scheduler) {
           scheduler.amount = dto.amount;
-          this.budgetSchedulerRepository.save(scheduler);
+          await this.budgetSchedulerRepository.save(scheduler);
         }
         break;
     }
 
-    return budget;
+    return true;
   }
 
-  public getScheduledBudgetsMaxDates(): Promise<ScheduledBudgetRow[]> {
-    return this.budgetRepository.query(
-      'SELECT MAX(budget.id) AS budgetId, schedulerId, MAX(`end`) AS maxEnd, budget_scheduler.repeat FROM budget LEFT JOIN budget_scheduler ON budget_scheduler.id = budget.schedulerId GROUP BY schedulerId;',
-    );
+  public getBudgetsToRescedule(): Promise<ScheduledBudgetRow[]> {
+    return this.budgetRepository
+      .query(
+        'SELECT MAX(budget.id) AS budgetId, schedulerId, MAX(`end`) AS maxEnd, budget_scheduler.repeat FROM budget LEFT JOIN budget_scheduler ON budget_scheduler.id = budget.schedulerId GROUP BY schedulerId;',
+      )
+      .then((budgets: ScheduledBudgetRow[]) =>
+        budgets.filter(
+          (budget: ScheduledBudgetRow) =>
+            this.dateCreator.format(addDays(budget.maxEnd, 1)) ===
+            this.dateCreator.today(),
+        ),
+      );
   }
 
   private async createScheduledBudget(dto: CreateBudgetRequest) {

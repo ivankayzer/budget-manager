@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { addMonths, addWeeks, parse } from 'date-fns';
+import { addMonths, addWeeks, parse, subDays } from 'date-fns';
 import { DateCreator } from '../date-creator';
 import { RepeatFrequency } from './interfaces/repeat-frequency';
 
@@ -25,6 +25,6 @@ export class BudgetSchedulerCalculator {
       date = addWeeks(date, 1);
     }
 
-    return this.dateCreator.format(date);
+    return this.dateCreator.format(subDays(date, 1));
   }
 }
