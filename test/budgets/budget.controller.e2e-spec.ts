@@ -11,7 +11,6 @@ import { Budget as budgetFactory } from '../factories/budget';
 import { RepeatFrequency } from '../../src/budgets/interfaces/repeat-frequency';
 import { BudgetScope } from '../../src/budgets/interfaces/budget-scope';
 import { Category } from '../../src/categories/category.entity';
-import { BudgetScheduler } from '../../src/budgets/budget-scheduler.entity';
 
 describe('BudgetController (e2e)', () => {
   let app: INestApplication;

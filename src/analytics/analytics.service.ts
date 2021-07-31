@@ -12,12 +12,12 @@ export class AnalyticsService {
   ) {}
 
   public async getTotalIncome(userId: string, dates: [string, string]) {
-    return +(await this.getTotals(userId, 'income', dates))[0].total;
+    return +(await this.getTotals(userId, 'income', dates))[0].amount;
   }
 
   public async getTotalExpenses(userId: string, dates: [string, string]) {
-    const expenses = (await this.getTotals(userId, 'expense', dates))[0].total;
-    const refunds = (await this.getTotals(userId, 'refund', dates))[0].total;
+    const expenses = (await this.getTotals(userId, 'expense', dates))[0].amount;
+    const refunds = (await this.getTotals(userId, 'refund', dates))[0].amount;
 
     return expenses - refunds;
   }
@@ -26,7 +26,7 @@ export class AnalyticsService {
     return await (
       await this.getSumByCategory(userId, 'income', dates)
     ).map((income: TextRow) => {
-      income.total = +income.total;
+      income.amount = +income.amount;
       return income;
     });
   }
@@ -44,7 +44,7 @@ export class AnalyticsService {
         return +expense;
       }
 
-      expense.total = expense.total - refundByCategory.total;
+      expense.amount = expense.amount - refundByCategory.amount;
       return expense;
     });
   }
@@ -53,9 +53,9 @@ export class AnalyticsService {
     userId: string,
     type: string,
     dates: [string, string],
-  ): Promise<[{ total: number | null }]> {
+  ): Promise<[{ amount: number | null }]> {
     const query: string[] = [
-      'SELECT SUM(amount) AS total FROM transaction WHERE',
+      'SELECT SUM(amount) AS amount FROM transaction WHERE',
       `type = '${type}'`,
       `AND userId = '${userId}'`,
       `AND paidAt >= '${dates[0]}'`,
@@ -71,7 +71,7 @@ export class AnalyticsService {
     dates: [string, string],
   ): Promise<TextRow[]> {
     const query: string[] = [
-      'SELECT categoryId, category.name AS categoryName, SUM(amount) AS total FROM transaction',
+      'SELECT categoryId, category.name AS categoryName, SUM(amount) AS amount FROM transaction',
       'LEFT JOIN category ON category.id = transaction.categoryId WHERE',
       `type = '${type}'`,
       `AND transaction.userId = '${userId}'`,

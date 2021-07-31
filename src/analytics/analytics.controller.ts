@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { DateCreator } from '../date-creator';
 import { BodyWithUserId } from '../auth/body-with-user.decorator';
@@ -14,8 +14,12 @@ export class AnalyticsController {
   ) {}
 
   @Get()
-  async getAnalytics(@BodyWithUserId() dto: UserDto) {
-    const dates = this.dateCreator.create();
+  async getAnalytics(
+    @BodyWithUserId() dto: UserDto,
+    @Query('start') start?: string,
+    @Query('end') end?: string,
+  ) {
+    const dates = this.dateCreator.createBetween(start, end);
 
     return Promise.all([
       this.analyticsService.getTotalIncome(dto.userId, dates),
@@ -36,7 +40,7 @@ export class AnalyticsController {
           },
           expense: {
             total: totalExpense,
-            byCategoty: expenseByCategory,
+            byCategory: expenseByCategory,
           },
         };
       },
