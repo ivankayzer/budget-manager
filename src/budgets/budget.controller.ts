@@ -38,6 +38,13 @@ export class BudgetController {
       );
   }
 
+  @Get(':id')
+  budget(@BodyWithUserId() dto: UserDto, @Param('id') id: number) {
+    return this.budgetService
+      .getById(dto.userId, id)
+      .then(this.budgetTransformer.transform);
+  }
+
   @Post()
   create(@BodyWithUserId() dto: CreateBudgetRequest) {
     return this.budgetService
@@ -49,7 +56,7 @@ export class BudgetController {
   update(@BodyWithUserId() dto: UpdateBudgetRequest, @Param('id') id: number) {
     return this.budgetService
       .updateBudgetById(id, dto)
-      .then(() => this.budgetService.findById(id))
+      .then(() => this.budgetService.getById(dto.userId, id))
       .then((budget) => this.budgetTransformer.transform(budget));
   }
 

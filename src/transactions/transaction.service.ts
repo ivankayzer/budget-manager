@@ -33,6 +33,13 @@ export class TransactionService {
     });
   }
 
+  public async getById(userId: string, id: number): Promise<Transaction> {
+    return this.transactionRepository.findOne({
+      id,
+      userId,
+    });
+  }
+
   async createTransaction(dto: CreateTransactionDto) {
     const transaction = new Transaction();
     transaction.amount = dto.amount;

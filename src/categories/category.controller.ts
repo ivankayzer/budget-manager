@@ -30,6 +30,13 @@ export class CategoryController {
       .then((categories) => categories.map(this.categoryTransformer.transform));
   }
 
+  @Get(':id')
+  category(@BodyWithUserId() dto: UserDto, @Param('id') id: number) {
+    return this.categoryService
+      .getById(dto.userId, id)
+      .then(this.categoryTransformer.transform);
+  }
+
   @Post()
   createCategory(@BodyWithUserId() dto: CreateCategoryDto) {
     return this.categoryService

@@ -37,6 +37,13 @@ export class TransactionController {
       );
   }
 
+  @Get(':id')
+  transaction(@BodyWithUserId() dto: UserDto, @Param('id') id: number) {
+    return this.transactionService
+      .getById(dto.userId, id)
+      .then(this.transactionTransformer.transform);
+  }
+
   @Post()
   createTransaction(@BodyWithUserId() dto: CreateTransactionDto) {
     return this.transactionService

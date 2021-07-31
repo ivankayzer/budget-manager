@@ -41,8 +41,11 @@ export class BudgetService {
     });
   }
 
-  public async findById(id: number): Promise<Budget> {
-    return this.budgetRepository.findOne(id);
+  public async getById(userId: string, id: number): Promise<Budget> {
+    return this.budgetRepository.findOne({
+      id,
+      userId
+    });
   }
 
   public async createBudget(dto: CreateBudgetRequest) {
@@ -173,14 +176,10 @@ export class BudgetService {
         'SELECT MAX(budget.id) AS budgetId, schedulerId, MAX(`end`) AS maxEnd, budget_scheduler.repeat FROM budget LEFT JOIN budget_scheduler ON budget_scheduler.id = budget.schedulerId GROUP BY schedulerId;',
       )
       .then((budgets: ScheduledBudgetRow[]) =>
-        budgets
-          .map((budget) => {
-            return budget;
-          })
-          .filter(
-            (budget: ScheduledBudgetRow) =>
-              this.dateCreator.format(budget.maxEnd) < this.dateCreator.today(),
-          ),
+        budgets.filter(
+          (budget: ScheduledBudgetRow) =>
+            this.dateCreator.format(budget.maxEnd) < this.dateCreator.today(),
+        ),
       );
   }
 
