@@ -1,10 +1,10 @@
 {
-  "name": "fln",
-  "version": "0.0.1",
+  "name": "budget-manager",
+  "version": "1.0.0",
   "description": "",
-  "author": "",
+  "author": "Ivan Kayzer",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
