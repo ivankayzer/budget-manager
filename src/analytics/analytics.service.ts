@@ -25,28 +25,34 @@ export class AnalyticsService {
   public async getIncomeByCategories(userId: string, dates: [string, string]) {
     return await (
       await this.getSumByCategory(userId, 'income', dates)
-    ).map((income: TextRow) => {
-      income.amount = +income.amount;
-      return income;
-    });
+    )
+      .map((income: TextRow) => {
+        income.amount = +income.amount;
+        return income;
+      })
+      .sort((a, b) => {
+        return a.amount > b.amount ? 1 : -1;
+      });
   }
 
   public async getExpensesByCategory(userId: string, dates: [string, string]) {
     const expenses = await this.getSumByCategory(userId, 'expense', dates);
     const refunds = await this.getSumByCategory(userId, 'refund', dates);
 
-    return expenses.map((expense: TextRow) => {
-      const refundByCategory = refunds.find(
-        (refund: TextRow) => refund.categoryId === expense.categoryId,
-      );
+    return expenses
+      .map((expense: TextRow) => {
+        const refundByCategory = refunds.find(
+          (refund: TextRow) => refund.categoryId === expense.categoryId,
+        );
 
-      if (!refundByCategory) {
-        return +expense;
-      }
+        if (!refundByCategory) {
+          return +expense;
+        }
 
-      expense.amount = expense.amount - refundByCategory.amount;
-      return expense;
-    });
+        expense.amount = expense.amount - refundByCategory.amount;
+        return expense;
+      })
+      .sort((a: TextRow, b: TextRow) => (a.amount > b.amount ? 1 : -1));
   }
 
   private getTotals(
